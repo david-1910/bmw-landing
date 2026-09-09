@@ -36,6 +36,12 @@ const peakFor = (t: number) => {
 }
 
 /**
+ * Where a blip falls back to. Deliberately well clear of idle: lifting off
+ * between blips should let the revs sag, not drop the needles to zero.
+ */
+const troughFor = (peak: number) => Math.max(peak * 0.45, 2100)
+
+/**
  * Gates the page on scene 1 being fully decoded — scrubbing a sequence that is
  * still downloading is what makes this kind of page feel broken, so the wait
  * is taken up front. Scenes 2 and 3 stay lazy, so this is ~7 MB, not all 17.
@@ -74,7 +80,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
   }, [])
 
   /** Engine speed is the only animated value; the speedometer follows it. */
-  const dial = useRef({ rpm: RPM_IDLE })
+  const dial = useRef({ rpm: troughFor(peakFor(0)) })
 
   /** Push the current values into both dials. */
   const render = () => {
@@ -100,7 +106,11 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       render()
       const tl = gsap.timeline({ repeat: -1, repeatRefresh: true, onUpdate: render })
       tl.to(dial.current, { rpm: () => peakRef.current, duration: 0.8, ease: 'power2.out' })
-        .to(dial.current, { rpm: RPM_IDLE + 120, duration: 1.15, ease: 'power2.inOut' })
+        .to(dial.current, {
+          rpm: () => troughFor(peakRef.current),
+          duration: 1.15,
+          ease: 'power2.inOut',
+        })
         .to({}, { duration: 0.3 })
       return () => {
         tl.kill()
@@ -116,14 +126,22 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     gsap.killTweensOf(dial.current)
     const tl = gsap.timeline({
       onUpdate: render,
-      onComplete: () => {
-        setGone(true)
-        onDone()
-      },
+      onComplete: () => setGone(true),
     })
 
-    tl.to(dial.current, { rpm: RPM_LAUNCH, duration: 2.2, ease: 'power2.inOut' })
-      .to(rootRef.current, { opacity: 0, duration: 0.8, ease: 'power2.inOut' }, '-=0.5')
+    tl.to(dial.current, { rpm: RPM_LAUNCH, duration: 2.2, ease: 'power2.inOut' }).to(
+      rootRef.current,
+      {
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.inOut',
+        // Release the page as the fade begins, not after it: the reel then
+        // fades up underneath this panel as one cross-dissolve, instead of
+        // the panel clearing first and the title card arriving separately.
+        onStart: onDone,
+      },
+      '-=0.5',
+    )
 
     return () => {
       tl.kill()
@@ -142,15 +160,19 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         <div className="m-stripe h-[3px] w-28 md:w-40" />
       </div>
 
-      {/* Cluster order as in the car: speedometer left, rev counter right. */}
-      <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-10 md:gap-x-20">
+      {/*
+        Cluster order and hierarchy as in the car: the speedometer sits left
+        and larger — it is the dial that matters — with the rev counter close
+        beside it rather than floating off on its own.
+      */}
+      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-8 md:gap-x-5">
         <Gauge
           id="speed"
           max={SPEED_MAX}
           step={50}
           unit="km/h"
           caption="Road speed"
-          size={330}
+          size={400}
         />
         <Gauge
           id="rpm"
@@ -160,7 +182,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
           labelDivisor={1000}
           unit="rpm × 1000"
           caption="Engine speed"
-          size={330}
+          size={278}
         />
       </div>
 

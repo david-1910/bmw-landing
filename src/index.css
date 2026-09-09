@@ -41,7 +41,13 @@
 
   body {
     margin: 0;
-    background: var(--color-studio);
+    /*
+     * Ink, not the studio grey: the page reads dark end to end now (preloader,
+     * title card, the data holds, the footer) and the light plate only ever
+     * appears inside a canvas. A light body showed through as a white flash in
+     * the gap between the preloader fading and the reel fading in.
+     */
+    background: var(--color-ink);
     color: var(--color-ink);
     font-family: var(--font-display);
     font-variation-settings: 'wdth' 100;
