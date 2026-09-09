@@ -1,0 +1,151 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Sampled from the studio plates so UI ground and footage never seam. */
+  --color-studio: #d3d8da;
+  --color-studio-lo: #b9c1c4;
+  --color-studio-hi: #e4e8e9;
+  --color-ink: #08090a;
+  --color-ink-soft: #16181a;
+
+  /* BMW M stripes: light blue, dark navy, red. */
+  --color-m-blue: #4c8fce;
+  --color-m-navy: #0b2b52;
+  --color-m-red: #ce1126;
+
+  /* A lifted red for small type — the stripe red is too dark to read on ink. */
+  --color-accent: #e8203a;
+
+  --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Newsreader', ui-serif, Georgia, serif;
+  --font-mono: 'Spline Sans Mono', ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    /* GSAP drives every scroll animation; native smooth scrolling fights it. */
+    scroll-behavior: auto;
+    background: var(--color-ink);
+
+    /* No visible scrollbar; scrolling itself is untouched. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-studio);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-variation-settings: 'wdth' 100;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: #fff;
+  }
+}
+
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* Wide, tight, industrial — the press-kit headline voice. */
+@utility display-xl {
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 118;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.86;
+  text-transform: uppercase;
+}
+
+@utility display-lg {
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 112;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+@utility prose-editorial {
+  font-family: var(--font-body);
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-size: clamp(1rem, 1.05vw + 0.6rem, 1.3rem);
+  line-height: 1.62;
+  letter-spacing: 0.005em;
+}
+
+/*
+ * The frame layers in a Bridge dissolve at top and bottom instead of ending on
+ * a hard line, so the light plate melts into the dark section.
+ */
+@utility frame-dissolve {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 6%,
+    #000 18%,
+    #000 82%,
+    rgba(0, 0, 0, 0.35) 94%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 6%,
+    #000 18%,
+    #000 82%,
+    rgba(0, 0, 0, 0.35) 94%,
+    transparent 100%
+  );
+}
+
+/* Fixed chrome that reads correctly over both the light plates and the dark bridges. */
+@utility blend-invert {
+  mix-blend-mode: difference;
+  color: #fff;
+}
+
+@utility m-stripe {
+  background: linear-gradient(
+    90deg,
+    var(--color-m-blue) 0 33.333%,
+    var(--color-m-navy) 33.333% 66.666%,
+    var(--color-m-red) 66.666% 100%
+  );
+}
+
+/* Very fine film grain; keeps the large flat plates from banding. */
+@utility grain {
+  position: relative;
+}
+@utility grain-layer {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
