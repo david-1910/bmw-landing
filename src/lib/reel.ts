@@ -38,7 +38,9 @@ export interface ChapterSpec {
 const CHAPTER_SPECS: ChapterSpec[] = [
   { scene: SCENES['scene-1'], copy: chapterInterior, scrubVh: 260, holdVh: 320, enterVh: 110 },
   { scene: SCENES['scene-2'], copy: chapterPerformance, scrubVh: 280, holdVh: 320, enterVh: 90 },
-  { scene: SCENES['scene-3'], copy: chapterRoundel, scrubVh: 280, holdVh: 290, enterVh: 90 },
+  // Scene 3 gets the longest scrub: it is a slow pull-back to the roundel and
+  // reads as a rushed swipe at the same rate as the others.
+  { scene: SCENES['scene-3'], copy: chapterRoundel, scrubVh: 420, holdVh: 290, enterVh: 90 },
 ]
 
 export interface ChapterGeom extends ChapterSpec {

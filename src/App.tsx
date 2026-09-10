@@ -41,7 +41,7 @@ export default function App() {
         className={open ? 'opacity-100' : 'pointer-events-none opacity-0'}
         style={{ transition: 'opacity 500ms ease-out' }}
       >
-        {reduced ? <StaticReel /> : <SceneReel fit={fit} animateIntro={open} />}
+        {reduced ? <StaticReel /> : <SceneReel fit={fit} started={open} />}
         <Footer />
       </main>
     </>

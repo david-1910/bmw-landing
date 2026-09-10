@@ -10,8 +10,10 @@ import { REEL } from '@/lib/reel'
  * stacked inside it — title card first, then a layer per scene. There are no
  * per-scene sections and no separate interstitials: a chapter's data is held
  * on the end of its own scene, and the next scene surfaces through it.
+ *
+ * `started` is false until the preloader releases, so nothing runs before then.
  */
-export function SceneReel({ fit, animateIntro }: { fit: FitMode; animateIntro: boolean }) {
+export function SceneReel({ fit, started }: { fit: FitMode; started: boolean }) {
   /*
    * A callback ref into state, not a plain ref: the layers measure their
    * triggers against this element from inside useGSAP, which is a layout
@@ -23,14 +25,14 @@ export function SceneReel({ fit, animateIntro }: { fit: FitMode; animateIntro: b
   return (
     <section ref={setTrack} className="relative bg-ink" style={{ height: `${REEL.totalVh}vh` }}>
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        <IntroLayer track={track} animate={animateIntro} />
+        <IntroLayer track={track} animate={started} />
         {REEL.geoms.map((geom) => (
           <ChapterLayer key={geom.scene.id} geom={geom} track={track} fit={fit} />
         ))}
       </div>
 
-      {/* Sound rides the last chapter only. */}
-      <SceneAudio geom={REEL.geoms[REEL.geoms.length - 1]} track={track} />
+      {/* Sound rides the last chapter only, and only once the page is live. */}
+      <SceneAudio geom={REEL.geoms[REEL.geoms.length - 1]} track={track} armed={started} />
     </section>
   )
 }
