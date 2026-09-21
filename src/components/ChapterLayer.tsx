@@ -204,7 +204,23 @@ export function ChapterLayer({ geom, track, fit }: Props) {
         tl.fromTo(
           target,
           from,
-          { ...vars, ease: vars.ease ?? 'none', duration: Math.max(to - start, 1) },
+          {
+            ...vars,
+            ease: vars.ease ?? 'none',
+            duration: Math.max(to - start, 1),
+            /*
+             * The one setting this whole file depends on.
+             *
+             * A `fromTo` paints its start values on the first tick even when
+             * it sits far down the timeline, so with several segments on one
+             * target the last one created wins — a block's *exit* would set it
+             * back to opacity 1 and undo the hidden state it is supposed to
+             * begin in. Every initial state is therefore declared once with
+             * `gsap.set` below, and no segment is allowed to pre-empt it; each
+             * one initialises when the playhead actually reaches it.
+             */
+            immediateRender: false,
+          },
           rel(start),
         )
 
@@ -307,8 +323,8 @@ export function ChapterLayer({ geom, track, fit }: Props) {
        * keeps each band's transform to a single tween and out of the
        * shared-target trap the timelines above exist to avoid.
        */
-      gsap.set(bandFar, { z: -260, rotationX: -7, opacity: 0 })
-      gsap.set(bandNear, { z: 190, rotationX: 5, opacity: 0 })
+      gsap.set(bandFar, { z: -260, rotationX: -7, opacity: 0, xPercent: 6, rotationY: 24 })
+      gsap.set(bandNear, { z: 190, rotationX: 5, opacity: 0, xPercent: -46, rotationY: 24 })
 
       /*
        * Every hidden state has to be set here as well as stated as a `fromTo`
@@ -323,13 +339,26 @@ export function ChapterLayer({ geom, track, fit }: Props) {
        *
        * (A stagger makes it worse still, since each target starts at its own
        * offset, but the plain case is enough to break it.)
+       *
+       * The block itself starts hidden rather than merely holding hidden
+       * children, because not everything inside one is text: a light stop
+       * carries a plate-coloured scrim, and hiding only the copy left that
+       * scrim lying over the closed veil of every dark stop before it, as a
+       * pale wash across the bottom of the screen.
        */
+      gsap.set(head.current, { i: 0 })
+      gsap.set(veil, { opacity: 0 })
+      gsap.set(hud, { opacity: 1 })
       gsap.set(wordmark, { opacity: 0, scale: 1.26 })
+      if (geom.enterVh > 0) {
+        gsap.set(layer, { opacity: 0 })
+        gsap.set(canvas, { scale: 1.07, filter: 'blur(7px)' })
+      }
       for (const st of geom.stations) {
         const root = blockOf(st)
         if (!root) continue
         const sq = gsap.utils.selector(root)
-        gsap.set(root, { opacity: 1, y: 0 })
+        gsap.set(root, { opacity: 0, y: 0 })
         gsap.set(sq('[data-reveal="line"]'), { yPercent: 115 })
         gsap.set(sq('[data-reveal="rule"]'), { scaleX: 0 })
         gsap.set(sq('[data-reveal="soft"]'), { opacity: 0, y: 28 })
@@ -345,6 +374,15 @@ export function ChapterLayer({ geom, track, fit }: Props) {
 
         if (root) {
           const sq = gsap.utils.selector(root)
+          /* The block arrives just ahead of its first line, scrim and all. */
+          seg(
+            copyTl,
+            root,
+            { opacity: 0 },
+            st.holdStart + reveal * 0.14,
+            { opacity: 1 },
+            st.holdStart,
+          )
           seg(
             copyTl,
             sq('[data-reveal="line"]'),

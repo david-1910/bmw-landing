@@ -1,6 +1,4 @@
 @import 'tailwindcss';
-/* Lenis' own guards: unlock html/body height and clip while it is stopped. */
-@import 'lenis/dist/lenis.css';
 
 @theme {
   /* Sampled from the studio plates so UI ground and footage never seam. */
