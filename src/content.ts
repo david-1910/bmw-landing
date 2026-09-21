@@ -33,6 +33,8 @@ export interface ChapterCopy {
   lines: string[]
   body: string
   stats?: Stat[]
+  /** A closing line under the body, where a stop has one. */
+  note?: string
 }
 
 /** Held on the end of scene 1, which finishes inside the cabin. */
@@ -49,19 +51,68 @@ export const chapterInterior: ChapterCopy = {
   ],
 }
 
-/** Held on the end of scene 2, after the full exterior orbit. */
-export const chapterPerformance: ChapterCopy = {
-  eyebrow: '02 — Chassis & body',
-  lines: ['Five metres,', 'held down'],
-  body:
-    'Almost five metres of saloon on forged 20-inch wheels, with a wider front track, stiffer engine mounts and M-specific adaptive dampers offering three distinct settings. The M compound brakes can be swapped for carbon ceramics; either way the speed limiter lifts from 250 to 305 km/h with the M Driver’s Package.',
-  stats: [
-    { value: '4.96', unit: 'm', label: 'Overall length' },
-    { value: '20', unit: 'in', label: 'Forged M wheels' },
-    { value: '3', unit: '', label: 'Damper settings' },
-    { value: '305', unit: 'km/h', label: 'M Driver’s Package' },
-  ],
-}
+/**
+ * Scene 2 is a full orbit, so it is read in four stops rather than one: the
+ * camera halts and each halt holds the part of the car it is actually looking
+ * at. One block of copy over a rotating body would have described nothing in
+ * particular.
+ *
+ * The order is the camera's, not an editor's — the orbit runs three-quarter
+ * front, tail, the far flank, and back round to the nose — so these may not be
+ * reordered without re-timing `at` in the reel to match. A block describing the
+ * exhaust while the frame is showing the grille is the one failure this whole
+ * structure exists to avoid.
+ */
+export const chapterChassis: ChapterCopy[] = [
+  {
+    eyebrow: '02.1 — Proportion',
+    lines: ['Long bonnet,', 'short overhangs'],
+    body:
+      'Nearly five metres of saloon standing on a 2.98-metre wheelbase, which is what leaves the overhangs as short as they look from here. The Competition sits seven millimetres lower than the standard M5 on its own springs, and carries a carbon-fibre roof to take mass out of the highest point on the car.',
+    stats: [
+      { value: '4.96', unit: 'm', label: 'Overall length' },
+      { value: '2.98', unit: 'm', label: 'Wheelbase' },
+      { value: '1.90', unit: 'm', label: 'Width, mirrors folded' },
+      { value: '1865', unit: 'kg', label: 'Kerb weight, DIN' },
+    ],
+  },
+  {
+    eyebrow: '02.2 — Tail',
+    lines: ['Four pipes,', 'one diffuser'],
+    body:
+      'The quad tailpipes are the honest ones — all four are live, fed by a flap-controlled exhaust quiet enough to leave at dawn and emphatically not when it is asked. Above them a boot-lid spoiler and an M rear diffuser do the actual work of keeping the rear axle loaded at the 305 km/h the M Driver’s Package unlocks.',
+    stats: [
+      { value: '4', unit: '', label: 'Live tailpipes' },
+      { value: '1624', unit: 'mm', label: 'Rear track' },
+      { value: '530', unit: 'l', label: 'Luggage capacity' },
+      { value: '305', unit: 'km/h', label: 'Limiter lifted' },
+    ],
+  },
+  {
+    eyebrow: '02.3 — Profile',
+    lines: ['Twenty inches,', 'staggered'],
+    body:
+      'Forged M double-spoke wheels, wider at the back than the front, which is the clearest sign that M xDrive is rear-biased by design rather than by mode. Behind them sit six-piston fixed front calipers; the carbon-ceramic option swaps them for larger discs and takes around 23 kg out of the unsprung mass.',
+    stats: [
+      { value: '20', unit: 'in', label: 'Forged M wheels' },
+      { value: '285', unit: '/35', label: 'Rear tyre, R20' },
+      { value: '3', unit: '', label: 'Adaptive damper settings' },
+      { value: '23', unit: 'kg', label: 'Saved on ceramics' },
+    ],
+  },
+  {
+    eyebrow: '02.4 — Front end',
+    lines: ['Air first,', 'styling second'],
+    body:
+      'Almost none of this face is decoration. The kidneys and the three lower intakes feed a radiator pack sized for sustained track use — engine, gearbox and charge-air coolers all draw through here — and the front track is wider than a 5 Series to put the extra rubber where the load goes.',
+    stats: [
+      { value: '3', unit: '', label: 'Lower air intakes' },
+      { value: '1633', unit: 'mm', label: 'Front track' },
+      { value: '275', unit: '/35', label: 'Front tyre, R20' },
+      { value: '395', unit: 'mm', label: 'Front M compound discs' },
+    ],
+  },
+]
 
 /** Held on the end of scene 3, on the roundel. */
 export const chapterRoundel: ChapterCopy = {
@@ -75,6 +126,26 @@ export const chapterRoundel: ChapterCopy = {
     { value: '3.3', unit: 's', label: '0–100 km/h' },
     { value: '10.8', unit: 's', label: '0–200 km/h' },
   ],
+}
+
+/**
+ * The slogan, driven through the roundel on the stop after the powertrain
+ * data. Two bands rather than one line: they travel in opposite directions and
+ * blend against the plate, so the badge has to be passed *through* rather than
+ * decorated.
+ */
+export const slogan = ['Freude am Fahren', 'Sheer driving pleasure'] as const
+
+/**
+ * The last stop of the last scene. This is where the plate finally drains to
+ * ink — the only blackout in scene 3, and the page ends on it.
+ */
+export const chapterSignoff: ChapterCopy = {
+  eyebrow: 'F90 · 2018–2023',
+  lines: ['Nothing left', 'to prove'],
+  body:
+    'Six hundred and twenty five horsepower, four doors and a boot that takes the weekend. The M5 has never had to explain itself — it just has to be started.',
+  note: 'BMW M GmbH · Garching bei München',
 }
 
 export const footer = {

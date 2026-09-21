@@ -9,11 +9,21 @@ import { REEL } from '@/lib/reel'
  * The whole visual page: one scroll track, one pinned stage, and the layers
  * stacked inside it — title card first, then a layer per scene. There are no
  * per-scene sections and no separate interstitials: a chapter's data is held
- * on the end of its own scene, and the next scene surfaces through it.
+ * on the stops of its own scene, and the next scene surfaces through it. The
+ * finale is the last two stops of scene 3 rather than a layer of its own, so
+ * the roundel is never handed off and re-introduced.
  *
  * `started` is false until the preloader releases, so nothing runs before then.
  */
-export function SceneReel({ fit, started }: { fit: FitMode; started: boolean }) {
+export function SceneReel({
+  fit,
+  started,
+  sound,
+}: {
+  fit: FitMode
+  started: boolean
+  sound: boolean
+}) {
   /*
    * A callback ref into state, not a plain ref: the layers measure their
    * triggers against this element from inside useGSAP, which is a layout
@@ -32,7 +42,12 @@ export function SceneReel({ fit, started }: { fit: FitMode; started: boolean }) 
       </div>
 
       {/* Sound rides the last chapter only, and only once the page is live. */}
-      <SceneAudio geom={REEL.geoms[REEL.geoms.length - 1]} track={track} armed={started} />
+      <SceneAudio
+        geom={REEL.geoms[REEL.geoms.length - 1]}
+        track={track}
+        armed={started}
+        enabled={sound}
+      />
     </section>
   )
 }
